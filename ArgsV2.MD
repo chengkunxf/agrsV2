@@ -19,7 +19,7 @@
 
 
 卡住的地方：
-1. 第一个异常处理，处理只有一个参数的时候，默认值情况，调试比较久
+1. 处理只有一个参数的时候，默认值情况，调试比较久:Object flagValue = argsValue.length > 1 ? argsValue[1] : schemaFlag.getDefaultValue(flagName);
 原因：应该传入 flagName，而不是 args[0]=-l  ,参数定义太多，参数值拆分不够清晰，flagName直接取值为 l  
 
 

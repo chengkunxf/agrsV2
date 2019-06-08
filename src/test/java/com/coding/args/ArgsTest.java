@@ -1,27 +1,49 @@
 package com.coding.args;
 
-import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 
 public class ArgsTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
-    @Ignore
     public void should_parser_input_text() {
-        String[] argsAsArray = new String[]{"-l true", "-p 8080", "-d /usr/log"};
+        String argsAsText = "-l true -p 8080 -d /usr/log";
 
         // TODO:把字符串形式的Schema解析成对象
-        String schemaDesc = "l:boolean p:int d:string";
+        String schemaDesc = "l:boolean p:integer d:string";
         SchemaFlag schemaFlag = new SchemaFlag(schemaDesc);
 
         // TODO:根据schema和参数字符串数组获取参数值
-        Args args = new Args(argsAsArray, schemaFlag);
+        Args args = new Args(argsAsText, schemaFlag);
         assertThat(args.getValue("l"), is(true));
         assertThat(args.getValue("p"), is(8080));
     }
+
+    @Test
+    public void should_parser_input_text_array() {
+        String argsAsText = "-l -p 8080 -d /usr/log -s this,is,all -i 80,90,100";
+
+        // TODO:把字符串形式的Schema解析成对象
+        String schemaDesc = "l:boolean p:integer d:string s:string[] i:integer[]";
+        SchemaFlag schemaFlag = new SchemaFlag(schemaDesc);
+
+        // TODO:根据schema和参数字符串数组获取参数值
+        Args args = new Args(argsAsText, schemaFlag);
+        assertThat(args.getValue("l"), is(false));
+        assertThat(args.getValue("p"), is(8080));
+        assertThat(args.getValue("d"), is("/usr/log"));
+        assertArrayEquals(new String[]{"this", "is", "all"}, (String[]) args.getValue("s"));
+        assertArrayEquals(new Integer[]{80, 90, 100}, (Integer[]) args.getValue("i"));
+    }
+
 
     @Test
     public void should_parse_one_schema() {
@@ -40,11 +62,15 @@ public class ArgsTest {
         assertThat(schemaFlag.getType("d"), is("string"));
         assertThat(schemaFlag.getDefaultValue("d"), is(""));
         assertThat(schemaFlag.getSize(), is(1));
+    }
 
-        schemaFlag = new SchemaFlag("b:byte");
-        assertThat(schemaFlag.getType("b"), is("byte"));
-        assertThat(schemaFlag.getDefaultValue("b"), is("This byte type is not supported"));
-        assertThat(schemaFlag.getSize(), is(1));
+    @Test
+    public void should_throws_illegalArgumentException_when_parse_schema() {
+        // TODO 异常测试用例，先期望异常，然后在触发，比较直接
+        SchemaFlag schemaFlag = new SchemaFlag("b:byte");
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("This byte type is not supported");
+        schemaFlag.getDefaultValue("b");
     }
 
     @Test
@@ -63,46 +89,47 @@ public class ArgsTest {
         assertThat(schemaFlag.getDefaultValue("d"), is(""));
 
         assertThat(schemaFlag.getType("b"), is("byte"));
-        assertThat(schemaFlag.getDefaultValue("b"), is("This byte type is not supported"));
+        thrown.expect(IllegalArgumentException.class);
+        schemaFlag.getDefaultValue("b");
     }
 
     @Test
     public void should_parse_boolean_text() {
-        String[] argsAsArray = new String[]{"-l true"};
+        String argsAsText = "-l true";
         SchemaFlag schemaFlag = new SchemaFlag("l:boolean");
-        Args args = new Args(argsAsArray, schemaFlag);
+        Args args = new Args(argsAsText, schemaFlag);
         assertThat(args.getValue("l"), is(true));
     }
 
     @Test
     public void should_parse_integer_text() {
-        String[] argsAsArray = new String[]{"-p 8080"};
+        String argsAsText = "-p 8080";
         SchemaFlag schemaFlag = new SchemaFlag("p:integer");
-        Args args = new Args(argsAsArray, schemaFlag);
+        Args args = new Args(argsAsText, schemaFlag);
         assertThat(args.getValue("p"), is(8080));
     }
 
     @Test
     public void should_parse_string_text() {
-        String[] argsAsArray = new String[]{"-d /usr/log"};
+        String argsAsText = "-d /usr/log";
         SchemaFlag schemaFlag = new SchemaFlag("d:string");
-        Args args = new Args(argsAsArray, schemaFlag);
+        Args args = new Args(argsAsText, schemaFlag);
         assertThat(args.getValue("d"), is("/usr/log"));
     }
 
     @Test
     public void should_parse_boolean_default_text() {
-        String[] argsAsArray = new String[]{"-l "};
+        String argsAsText = "-l";
         SchemaFlag schemaFlag = new SchemaFlag("l:boolean");
-        Args args = new Args(argsAsArray, schemaFlag);
+        Args args = new Args(argsAsText, schemaFlag);
         assertThat(args.getValue("l"), is(false));
     }
 
     @Test
     public void should_parse_integer_default_text() {
-        String[] argsAsArray = new String[]{"-p "};
+        String argsAsText = "-p";
         SchemaFlag schemaFlag = new SchemaFlag("p:integer");
-        Args args = new Args(argsAsArray, schemaFlag);
+        Args args = new Args(argsAsText, schemaFlag);
         assertThat(args.getValue("p"), is(0));
     }
 

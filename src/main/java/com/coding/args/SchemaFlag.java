@@ -22,7 +22,13 @@ public class SchemaFlag {
         if ("string".equals(typeStr.toLowerCase())) {
             return "";
         }
-        return String.format("This %s type is not supported", typeStr);
+        if ("integer[]".equals(typeStr.toLowerCase())) {
+            return new Integer[]{};
+        }
+        if ("string[]".equals(typeStr.toLowerCase())) {
+            return new String[]{};
+        }
+        throw new IllegalArgumentException(String.format("This %s type is not supported", typeStr));
     }
 
     private String getTypeString(String flagName) {
