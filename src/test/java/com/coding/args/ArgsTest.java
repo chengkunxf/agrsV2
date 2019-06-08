@@ -41,7 +41,8 @@ public class ArgsTest {
         assertThat(args.getValue("p"), is(8080));
         assertThat(args.getValue("d"), is("/usr/log"));
         assertArrayEquals(new String[]{"this", "is", "all"}, (String[]) args.getValue("s"));
-        assertArrayEquals(new Integer[]{80, 90, 100}, (Integer[]) args.getValue("i"));
+        Integer[] integers = {80, 90, 100};
+        assertArrayEquals(integers, (Integer[]) args.getValue("i"));
     }
 
 
