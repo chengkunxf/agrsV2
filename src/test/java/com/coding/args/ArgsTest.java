@@ -21,7 +21,7 @@ public class ArgsTest {
      *
      * ### 测试用例步骤
      * 1. 任务拆解的测试用例,来描述需求,伪实现 Ignore 掉
-     * 2. 把字符串解析成 schema 对象,一个 one_schema 的解析 l:boolean,验证类型,size,默认值,伪实现 Ignore 掉
+     * 2. 把字符串解析成 schema 对象,一个 one_schema 的解析 l:boolean,验证类型,size,默认值
      * 3. schema 参数与结构不匹配,返回异常和异常信息
      * 4. 解析多个schema l:boolean p:integer d:string 验证 size ,类型,默认值
      * 5. 单个命令字符串,单个 schema 的解析 -l true l:boolean, args.getValue("l")
