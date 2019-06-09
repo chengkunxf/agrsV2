@@ -1,5 +1,6 @@
 package com.coding.args;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -10,10 +11,32 @@ import static org.junit.Assert.assertThat;
 
 public class ArgsTest {
 
+    /***
+     * ### 任务拆解
+     * 像机器一样思考，整个任务大概分为如下事情：
+     * 1. 构造一个命令行字符串：-l true -p 8080 -d /usr/log
+     * 2. 构造一个字符串形式的 schema 对象：l:boolean p:integer d:string
+     * 3. 根据命令行字符串和 schema 对象获取参数值： Args(stringArgs,schema ) args.getValue("l") == true
+     *
+     *
+     * ### 测试用例步骤
+     * 1. 把字符串解析成 schema 对象,一个 one_schema 的解析 l:boolean,验证类型,size,默认值,伪实现 Ignore 掉
+     * 2. schema 参数与结构不匹配,返回异常和异常信息
+     * 3. 解析多个schema l:boolean p:integer d:string 验证 size ,类型,默认值
+     * 4. 单个命令字符串,单个 schema 的解析 -l true l:boolean, args.getValue("l")
+     * 5. 单个命令的解析 -p 8080 p:integer 的解析, args.getValue("p")
+     * 6. 单个命令的解析-d /usr/log d:string 的解析, args.getValue("d")
+     * 7. 解析默认值的情况 -l l:boolean
+     * 8. 解析默认值的情况 -p p:integer
+     * 9. 去掉 步骤一的 Ignore,全部通过
+     * 10. 解析多个参数 input_array
+     */
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Test
+//    @Ignore
     public void should_parser_input_text() {
         String argsAsText = "-l true -p 8080 -d /usr/log";
 
@@ -21,30 +44,11 @@ public class ArgsTest {
         String schemaDesc = "l:boolean p:integer d:string";
         SchemaFlag schemaFlag = new SchemaFlag(schemaDesc);
 
-        // TODO:根据schema和参数字符串数组获取参数值
+        // TODO:根据schema和参数字符串获取参数值
         Args args = new Args(argsAsText, schemaFlag);
         assertThat(args.getValue("l"), is(true));
         assertThat(args.getValue("p"), is(8080));
     }
-
-    @Test
-    public void should_parser_input_text_array() {
-        String argsAsText = "-l -p 8080 -d /usr/log -s this,is,all -i 80,90,100";
-
-        // TODO:把字符串形式的Schema解析成对象
-        String schemaDesc = "l:boolean p:integer d:string s:string[] i:integer[]";
-        SchemaFlag schemaFlag = new SchemaFlag(schemaDesc);
-
-        // TODO:根据schema和参数字符串数组获取参数值
-        Args args = new Args(argsAsText, schemaFlag);
-        assertThat(args.getValue("l"), is(false));
-        assertThat(args.getValue("p"), is(8080));
-        assertThat(args.getValue("d"), is("/usr/log"));
-        assertArrayEquals(new String[]{"this", "is", "all"}, (String[]) args.getValue("s"));
-        Integer[] integers = {80, 90, 100};
-        assertArrayEquals(integers, (Integer[]) args.getValue("i"));
-    }
-
 
     @Test
     public void should_parse_one_schema() {
@@ -134,4 +138,21 @@ public class ArgsTest {
         assertThat(args.getValue("p"), is(0));
     }
 
+    @Test
+    public void should_parser_input_text_array() {
+        String argsAsText = "-l -p 8080 -d /usr/log -s this,is,all -i 80,90,100";
+
+        // TODO:把字符串形式的Schema解析成对象
+        String schemaDesc = "l:boolean p:integer d:string s:string[] i:integer[]";
+        SchemaFlag schemaFlag = new SchemaFlag(schemaDesc);
+
+        // TODO:根据schema和参数字符串获取参数值
+        Args args = new Args(argsAsText, schemaFlag);
+        assertThat(args.getValue("l"), is(false));
+        assertThat(args.getValue("p"), is(8080));
+        assertThat(args.getValue("d"), is("/usr/log"));
+        assertArrayEquals(new String[]{"this", "is", "all"}, (String[]) args.getValue("s"));
+        Integer[] integers = {80, 90, 100};
+        assertArrayEquals(integers, (Integer[]) args.getValue("i"));
+    }
 }
