@@ -1,11 +1,23 @@
 package com.coding.args;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SchemaFlag {
     public static final String REGEX_SPACE = " ";
     private String schemaDesc;
+
+    public static final Map<String, Object> TYPE_MAP = new HashMap() {
+        {
+            put("boolean", false);
+            put("integer", 0);
+            put("string", "");
+            put("integer[]", new Integer[]{});
+            put("string[]", new String[]{});
+        }
+    };
 
     public SchemaFlag(String schemaDesc) {
         this.schemaDesc = schemaDesc;
@@ -13,22 +25,9 @@ public class SchemaFlag {
 
     public Object getDefaultValue(String flagName) {
         String typeStr = getTypeString(flagName);
-        if ("boolean".equals(typeStr.toLowerCase())) {
-            return false;
-        }
-        if ("integer".equals(typeStr.toLowerCase())) {
-            return 0;
-        }
-        if ("string".equals(typeStr.toLowerCase())) {
-            return "";
-        }
-        if ("integer[]".equals(typeStr.toLowerCase())) {
-            return new Integer[]{};
-        }
-        if ("string[]".equals(typeStr.toLowerCase())) {
-            return new String[]{};
-        }
-        throw new IllegalArgumentException(String.format("This %s type is not supported", typeStr));
+        if (TYPE_MAP.get(typeStr) == null)
+            throw new IllegalArgumentException(String.format("This %s type is not supported", typeStr));
+        return TYPE_MAP.get(typeStr);
     }
 
     private String getTypeString(String flagName) {

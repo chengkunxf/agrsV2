@@ -23,27 +23,12 @@ public class Args {
     }
 
     public Object getValue(String flagName) {
-        Object tmpValue = flagMap.get(flagName);
+        Object flagValue = flagMap.get(flagName);
         String type = schemaFlag.getType(flagName);
-        if (("boolean").equals(type)) {
-            return Boolean.valueOf(String.valueOf(tmpValue));
-        }
-        if (("integer").equals(type)) {
-            return Integer.valueOf(String.valueOf(tmpValue));
-        }
-        if (("string").equals(type)) {
-            return String.valueOf(tmpValue);
-        }
-        if (("string[]").equals(type)) {
-            return getStringArrayBySplit(String.valueOf(tmpValue), REGEX_ARRAY);
-        }
-        if (("integer[]").equals(type)) {
-            String[] strings = getStringArrayBySplit(String.valueOf(tmpValue), REGEX_ARRAY);
-            int[] ints = Arrays.stream(strings).mapToInt(Integer::parseInt).toArray();
-            Integer[] integers = ArrayUtils.toObject(ints);
-            return integers;
-        }
-        return tmpValue;
+        
+        Object realValue = ArgsValueServiceFactory.getArgsValueServiceStrategy(type).getArgsValue(flagValue.toString());
+
+        return realValue;
     }
 
     private String[] getStringArrayBySplit(String s, String regexArray) {
